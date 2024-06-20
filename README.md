@@ -45,9 +45,13 @@ In this section, we provide a detailed step-by-step description of the experimen
 
 ### Metric computation
     
-- Compute the metrics for the all reviews truth set and the positive truth set. By default, we use a time window of size ```w = 7``` and the truth set timeframe of ```t = Oct 06, 2022 - Nov 30, 2022```. 
+- Compute the metrics for the all reviews truth set and the positive truth set. By default, we use a time window of size ```w = 7``` and the truth set timeframe of ```t = Oct 06, 2022 - Nov 30, 2022```.
+- All ratings metrics:
 
     ```python ./scripts/compute_metrics.py -i data/preprocessed_review_set.json -w 7 -t 'Oct 06, 2022 - Nov 30, 2022' -o results/metrics/all```
+
+- Positive only metrics:
+
     ```python scripts/compute_metrics.py -i data/preprocessed_review_set_positive.json -w 7 -t 'Oct 06, 2022 - Nov 30, 2022' -o results/metrics/positive```
 
 - To compute the metrics for inference, the same structure can be followed using the time frame of ```t = Dec 01, 2022 - Jan 25, 2023```.
