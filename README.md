@@ -58,9 +58,13 @@ In this section, we provide a detailed step-by-step description of the experimen
 
 ### Event detection
 
-After metric extraction, events can be automatically detected and classified as an event or non-event. The script requires the metrics folder for train/test and inference, and the truth set file. The below is for the all ratings and positive-rated reviews respectively:
+After metric extraction, events can be automatically detected and classified as an event or non-event. The script requires the metrics folder for train/test and inference, and the truth set file. 
+- All ratings:
 
   ```python ./scripts/predict_events.py -m results/metrics/all -t data/truth_set_all.csv -i results/metrics/all_inference```
+
+- Positive  only:
+  
   ```python ./scripts/predict_events.py -m results/metrics/positive -t data/truth_set_pos.csv -i results/metrics/positive_inference```
 
 ### Summarization (utilized from the replication package of Motger et al.)
