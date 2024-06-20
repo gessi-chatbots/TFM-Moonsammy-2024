@@ -39,55 +39,31 @@ In this section, we provide a detailed step-by-step description of the experimen
 
 ### Data preprocessing
 
-- Preprocess the raw user reviews by providing the dataset and outtput folder. Note that the JSON file has to be unzipped first. 
+- Preprocess the raw user reviews by providing the dataset and output folder. Note that the JSON file has to be unzipped first. 
 
   ```python ./scripts/preprocess_reviews.py -i data/microblogging-review-set.json -o data```
 
 ### Metric computation
     
-- Compute the metrics for the all reviews truth set and the positive truth set. By default, we use a time window of size ```w = 7``` and the truth set timeframe of ```t = Oct 06, 2022 - Nov 30, 2022```.
+- Compute the metrics for the all reviews truth set and the positive truth set. By default, we use a time window of size ```w = 7``` and the truth set timeframe of ```t = Oct 06, 2022 - Nov 30, 2022```. Note that the JSON files has to be unzipped first.
 - All ratings metrics:
 
-    ```python ./scripts/compute_metrics.py -i data/preprocessed_review_set.json -w 7 -t 'Oct 06, 2022 - Nov 30, 2022' -o results/metrics/all```
+    ```python ./scripts/compute_metrics.py -i results/preprocessed_data/preprocessed_review_set.json -w 7 -t 'Oct 06, 2022 - Nov 30, 2022' -o results/metrics/all```
 
 - Positive only metrics:
 
-    ```python scripts/compute_metrics.py -i data/preprocessed_review_set_positive.json -w 7 -t 'Oct 06, 2022 - Nov 30, 2022' -o results/metrics/positive```
+    ```python scripts/compute_metrics.py -i results/preprocessed_data/preprocessed_review_set_positive.json -w 7 -t 'Oct 06, 2022 - Nov 30, 2022' -o results/metrics/positive```
 
 - To compute the metrics for inference, the same structure can be followed using the time frame of ```t = Dec 01, 2022 - Jan 25, 2023```.
 
 ### Event detection
 
-After metric extraction, events can be automatically detected and classified as an event or non-event.
-    
-- Collect the output files and paste the data into the ```results/metrics/event_monitoring.xlsx``` spreadsheet. This spreadsheet is configured to provide automated visualization of events, for which a sensitivity factor ```k = 2``` is set as default (can be modified). Specifically:
-	- 	```results/review_count.csv``` at ```review_count!A2:BA12```
-	- 	```results/review_rating.csv``` at ```review_rating!A2:BA12```
-	- 	```results/review_polarity.csv``` at ```review_polarity!A2:BA12```
+After metric extraction, events can be automatically detected and classified as an event or non-event. The script requires the metrics folder for train/test and inference, and the truth set file. The below is for the all ratings and positive-rated reviews respectively:
 
-- A heat-map containing the visualization of reported events for the computed metrics is available in ```results/metrics/event_monitoring.xlsx```, under the sheet named ```event_monitoring```.
+	- 	```python ./scripts/predict_events.py -m results/metrics/all -t data/truth_set_all.csv -i results/metrics/all_inference```
+	- 	```python scripts/predict_events.py -m results/metrics/positive -t data//truth_set_pos.csv -i results/metrics/positive_inference```
 
-- For generating the files for future analysis, it is necessary to retrieve the events in .csv format
-
-```python ./scripts/compute_events.py -i results/metrics/event_monitoring.xlsx -o results/correlation -k 2```
-
-### Correlation analysis
-
-Event-based metrics can then be used to compute review-based metric correlation.
-
-- Compute correlation.
-
-```python ./scripts/compute_correlation.py -i results/metrics/event_monitoring.xlsx -w 1 -o results/correlation/clusters.csv```
-
-### Potentially correlated events
-
-Intersection of events and correlated periods is used to retrieve potentially correlated events.
-
-- Compute intersection
-
-```python ./scripts/event_correlation_intersection.py -e results/correlation -c results/correlation/clusters.csv -o results/intersection.csv```
-
-### Summarization
+### Summarization (utilized from the replication package of Motger et al.)
 
 To conduct a sample summarization of a selected time window:
 
@@ -101,7 +77,7 @@ To conduct a sample summarization of a selected time window:
 
 	```com.twitter.android-reviews-Oct 27, 2022 - Nov 02, 2022```
     
-- Use ChatGPT to request a summarization of the most relevant events highlighted in the sample set of reviews. To do so, we used a prompt engineering approach within a zero shot learning context, for which the following prompt was designed:
+- Use Claude AI to request a summarization of the most relevant events highlighted in the sample set of reviews. To do so, we used a prompt engineering approach within a zero shot learning context, for which the following prompt was designed:
 
 	```
     <review-set>
@@ -111,12 +87,4 @@ To conduct a sample summarization of a selected time window:
     
     Where ```<review-set>``` is the content of the sample review file generated in step #7.
     
-    Files ```example_N.txt``` are the complete summarized output provided by ChatGPT from the Examples 1 -> 6 reported in the original manuscript.
-    
-	(!) Please note that systematic repetitions of this process can lead to slightly different results, mainly because of (1) the random selection of a sample set of reviews, and (2) the internal behaviour of ChatGPT.
-
-To conduct the automatic generation of multiple sets of reviews based on potentially correlated events:
-
-- Run a script to generate the batch of reviews to be used as input for ChatGPT prompt:
-
-```python scripts/run_multiple_get_review_by_date.py -i results/correlation/intersection.csv -o results/correlation/reviews```
+	(!) Please note that systematic repetitions of this process can lead to slightly different results, mainly because of (1) the random selection of a sample set of reviews, and (2) the internal behaviour of Claude AI.
