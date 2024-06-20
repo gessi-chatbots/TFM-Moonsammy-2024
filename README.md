@@ -43,6 +43,8 @@ In this section, we provide a detailed step-by-step description of the experimen
 
   ```python ./scripts/preprocess_reviews.py -i data/microblogging-review-set.json -o data```
 
+  The preprocessed data files are saved in the ```data``` folder. 
+
 ### Metric computation
     
 - Compute the metrics for the all reviews truth set and the positive truth set. By default, we use a time window of size ```w = 7``` and the truth set timeframe of ```t = Oct 06, 2022 - Nov 30, 2022```. Note that the JSON files has to be unzipped first.
