@@ -12,7 +12,7 @@ This package is structured in 3 main folders:
 
 ## Dataset
 
-We used the dataset from the paper Unveiling Competition Dynamics by Motger et al. This paper selected a subset of microblogging apps which included Twitter, Mastodon, and 10 additional microblogging Android mobile apps based on user crowdsourced software recommendations from the [AlternativeTo platform](https://alternativeto.net/software/twitter/?platform=android). For each app, Motger et al. collected all reviews available in multiple repositories published within a time window of 52 weeks (~1 year), from June 9th, 2022 to June 7th, 2023 (included). From the complete list of 12 microblogging apps, we excluded 2 apps for which the number of available reviews was insufficient for statistical analysis. The complete list of apps and the number of available reviews is reported in the following table.
+We used the dataset from the paper [Unveiling Competition Dynamics in Mobile App Markets through User Reviews]([https://alternativeto.net/software/twitter/?platform=android](https://arxiv.org/abs/2312.01981)) by Motger et al. This paper selected a subset of microblogging apps which included Twitter, Mastodon, and 10 additional microblogging Android mobile apps based on user crowdsourced software recommendations from the [AlternativeTo platform](https://alternativeto.net/software/twitter/?platform=android). For each app, Motger et al. collected all reviews available in multiple repositories published within a time window of 52 weeks (~1 year), from June 9th, 2022 to June 7th, 2023 (included). From the complete list of 12 microblogging apps, we excluded 2 apps for which the number of available reviews was insufficient for statistical analysis. The complete list of apps and the number of available reviews is reported in the following table.
 
 | App name      | App package                 | #reviews |
 |---------------|-----------------------------|----------|
@@ -37,25 +37,24 @@ In this section, we provide a detailed step-by-step description of the experimen
     
     ```pip install -r scripts/requirements.txt```
 
+### Data preprocessing
+
+- Preprocess the raw user reviews by providing the dataset and outtput folder. Note that the JSON file has to be unzipped first. 
+
+  ```python ./scripts/preprocess_reviews.py -i data/microblogging-review-set.json -o data```
+
 ### Metric computation
     
-- Compute the **review count (c)** metric. By default, we use a time window of size ```w = 7``` and an origin date ```tΩ = Jun 09, 2022``` (this applies to all metrics).
+- Compute the metrics for the all reviews truth set and the positive truth set. By default, we use a time window of size ```w = 7``` and the truth set timeframe of ```t = Oct 06, 2022 - Nov 30, 2022```. 
 
-    ```python ./scripts/compute_review_count.py -i ./data/microblogging-review-set.json -w 7 -t 'Jun 09, 2022' -o ./results/metrics```
-    
-- Compute the **review rating (r)** metric. 
+    ```python ./scripts/compute_metrics.py -i data/preprocessed_review_set.json -w 7 -t 'Oct 06, 2022 - Nov 30, 2022' -o results/metrics/all```
+    ```python scripts/compute_metrics.py -i data/preprocessed_review_set_positive.json -w 7 -t 'Oct 06, 2022 - Nov 30, 2022' -o results/metrics/positive```
 
-    ```python ./scripts/compute_review_rating.py -i ./data/microblogging-review-set.json -w 7 -t 'Jun 09, 2022' -o ./results/metrics```
-    
-- Compute the **review polarity (p)** metric. To run this script, we build on the work of a sentiment analysis service, available in a [GitHub repository](https://github.com/AgustiGM/sa_filter_tool). Therefore, it is necessary to install and run the service as depicted in the [README file](https://github.com/AgustiGM/sa_filter_tool#readme).
+- To compute the metrics for inference, the same structure can be followed using the time frame of ```t = Dec 01, 2022 - Jan 25, 2023```.
 
-	Once the service is up and running, the review polarity metric is ready to be computed. **[NOTE: This process might take a while]**.
+### Event detection
 
-    ```python ./scripts/compute_review_polarity.py -i ./data/microblogging-review-set.json -w 7 -t 'Jun 09, 2022' -o ./results/metrics```
-
-### Event visualization
-
-After metric extraction, events can be visualized in isolation for an event-based analysis.
+After metric extraction, events can be automatically detected and classified as an event or non-event.
     
 - Collect the output files and paste the data into the ```results/metrics/event_monitoring.xlsx``` spreadsheet. This spreadsheet is configured to provide automated visualization of events, for which a sensitivity factor ```k = 2``` is set as default (can be modified). Specifically:
 	- 	```results/review_count.csv``` at ```review_count!A2:BA12```
